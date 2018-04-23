@@ -1,6 +1,6 @@
 
-Informação original está online:
+Informação original está online na webpage:
 https://fenix.tecnico.ulisboa.pt/cursos/meec/dissertacoes
 
 Para gerar "online_DEEC.txt":
-Seleccionei tudo com Ctrl+a, depois colei word e finalmente exportei txt.
+Seleccionei toda a webpage com Ctrl+a, depois colei em MS-Word e finalmente exportei para txt.

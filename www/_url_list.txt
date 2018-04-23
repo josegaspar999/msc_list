@@ -1,0 +1,6 @@
+
+-- GIT to develop code for finding thesis (this txt is there):
+https://github.com/josegaspar999/msc_list.git
+
+-- Gdrive folder to place temporary lists of MSc:
+https://drive.google.com/drive/folders/1xDoKyoiyp22i068Nzm8LdWbOEwDJAXVZ?usp=sharing
