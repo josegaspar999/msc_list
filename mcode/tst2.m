@@ -5,6 +5,6 @@ fname= {'ma', 'meaer', 'meambi', 'mebiol', 'mebiom', 'mec', 'meec', 'meft', 'mem
 
 for i=1:length(fname)
     url= sprintf(bfname, fname{i});
-    ofname= ['z_' fname{i} '.htm'];
+    ofname= ['../data/z_' fname{i} '.htm'];
     urlwrite( url, ofname )
 end
