@@ -1,4 +1,4 @@
-function tst( tstId )
+function tst( tstId, options )
 %
 % Get thesis supervised at Vislab
 
@@ -7,9 +7,16 @@ function tst( tstId )
 if nargin<1
     tstId= 2; %3; %2; %1; %0;
 end
+if nargin<2
+    options= [];
+end
 
 fname= '../data/online_DEEC_180420.txt';
-options= struct('lines_ini','2017/2018', 'lines_end','* MEEC');
+if isfield(options, 'bfname'), fname= options.fname; end
+
+%options= struct('lines_ini','2017/2018', 'lines_end','* MEEC');
+options.lines_ini= '2017/2018';
+options.lines_end= '* MEEC';
 
 switch tstId
     case 0
