@@ -11,8 +11,8 @@ if nargin<2
     options= [];
 end
 
-fname= '../data/online_DEEC_180420.txt';
-if isfield(options, 'bfname'), fname= options.fname; end
+fname= '../data/180420_v0/online_DEEC_180420.txt';
+if isfield(options, 'fname'), fname= options.fname; end
 
 %options= struct('lines_ini','2017/2018', 'lines_end','* MEEC');
 options.lines_ini= '2017/2018';
