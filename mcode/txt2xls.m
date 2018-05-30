@@ -1,11 +1,11 @@
-function tst( tstId, options )
+function txt2xls( cmdId, options )
 %
 % Get thesis supervised at Vislab
 
 % 23.4.2018 (1st ver) J. Gaspar
 
 if nargin<1
-    tstId= 2; %3; %2; %1; %0;
+    cmdId= 2; %3; %2; %1; %0;
 end
 if nargin<2
     options= [];
@@ -18,8 +18,9 @@ if isfield(options, 'bfname'), fname= options.fname; end
 options.lines_ini= '2017/2018';
 options.lines_end= '* MEEC';
 
-switch tstId
+switch cmdId
     case 0
+        % find supervisor Id in the TXT file
         lst= {'(ist12760)', '(ist13761)', '(ist11994)', '(ist13495)'};
         for i=1:length(lst)
             str= ['!grep "' lst{i} '" ' fname];
@@ -27,10 +28,12 @@ switch tstId
         end
         
     case 1
+        % find all possible states of thesis
         mk_list_of_states( fname, options )
 
     case {2, 3}
-        if tstId == 3
+        % create XLS file from TXT info
+        if cmdId == 3
             options.ofname_xls= strrep( fname, '.txt', '_vislab.xls' );
         end
         mk_list_of_thesis( fname, options )
