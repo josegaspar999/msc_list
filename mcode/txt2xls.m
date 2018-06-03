@@ -21,7 +21,7 @@ options.lines_end= '* MEEC';
 switch cmdId
     case 0
         % find supervisor Id in the TXT file
-        lst= {'(ist12760)', '(ist13761)', '(ist11994)', '(ist13495)'};
+        lst= get_supervisor_list( options );
         for i=1:length(lst)
             str= ['!grep "' lst{i} '" ' fname];
             eval(str)
@@ -43,6 +43,18 @@ switch cmdId
 end
 
 return; % end of main function
+
+
+% ------------------------------------------------------------------------
+function lst= get_supervisor_list( options )
+lst= {'(ist12760)', '(ist13761)', '(ist11994)', '(ist13495)', '(ist31838)'};
+if isfield(options,'supervisorsList')
+    lst= {};
+    [lst{end+1}, remain]= strtok( options.supervisorsList, ',' );
+    while ~isempty(remain)
+        [lst{end+1}, remain]= strtok( remain, ',' );
+    end
+end
 
 
 % ------------------------------------------------------------------------
@@ -148,13 +160,12 @@ function mk_list_of_thesis( fname, options )
 %   Output tab separated file named *.xls, 4cols, author, thesis, state,
 %   supervisors
 
-
 y= text_read(fname);
 iRange= range_of_lines( y, options );
 nCoord= 0;
 lstStates= {}; % start empty
 
-lst= {'(ist12760)', '(ist13761)', '(ist11994)', '(ist13495)', '(ist31838)'};
+lst= get_supervisor_list( options );
 lstXLS= {'Year', 'State', 'Title', 'Author', 'Supervisors'};
 currYear= options.lines_ini;
 prevYear= prev_year_calc( currYear );

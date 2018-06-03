@@ -18,19 +18,24 @@ switch tstId
         main_tst_get_data( dname );
 
     case {0, 1, 2, 3}
+        % preliminary tests
         % 0 -> find supervisor Id in the TXT file
         % 1 -> find all possible states of thesis
         % 2,3 -> create XLS file from TXT info (2=display, 3=save)
         txt2xls( tstId );
 
     case 4
-        % our first complete test txt->xls->mat->html
+        % first complete test txt->xls->mat->html
         bfname= '../data/180420_v0/online_DEEC_180420.txt';
         z_complete_process( bfname )
         
     case 5
         % browse all MSc
         error('under construction')
+        % fetch remote data to a new folder "dname"
+        % convert downloaded files to text files
+        % list txt files in "dname"
+        % run "z_complete_process" for all text files
 
     otherwise
         error('inv tstId')

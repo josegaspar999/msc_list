@@ -1,4 +1,4 @@
-function z_complete_process( bfname )
+function z_complete_process( bfname, options )
 %
 % Launch the pipeline to convert information about MSc theses from
 % XLS+Fenix url to HTML.
@@ -18,11 +18,28 @@ if length(bfname)>4 && strcmpi( bfname(end-3:end), '.txt')
     bfname= bfname(1:end-4);
 end
 
+if nargin<2
+    options= [];
+end
+
+% -- make all filenames from a base name
+
 ini_file = [bfname '.txt'];             % all theses
 xls_file = [bfname '_vislab.xls'];      % Vislab only
 mat_file = [bfname '_vislab.mat'];      % extra info saved
 htm_file = [bfname '_vislab_html.txt']; % html output
 
-txt2xls(  2, struct('fname', ini_file, 'ofname_xls', xls_file) );
+% -- find the set of theses
+
+%txt2xls(  2, struct('fname', ini_file, 'ofname_xls', xls_file) );
+options.fname= ini_file;
+options.ofname_xls= xls_file;
+txt2xls(  2, options );
+
+% -- complete the information with extra info from fenix
+
 xls2mat(  xls_file, mat_file );
+
+% -- convert to HTML in order to publish
+
 mat2html( mat_file, htm_file );
