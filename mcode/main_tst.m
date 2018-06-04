@@ -27,7 +27,7 @@ switch tstId
     case 4
         % first complete test txt->xls->mat->html
         bfname= '../data/180420_v0/online_DEEC_180420.txt';
-        z_complete_process( bfname )
+        z_complete_process( bfname, options )
         
     case 5
         % browse all MSc

@@ -27,11 +27,14 @@ end
 ini_file = [bfname '.txt'];             % all theses
 xls_file = [bfname '_vislab.xls'];      % Vislab only
 mat_file = [bfname '_vislab.mat'];      % extra info saved
-htm_file = [bfname '_vislab_html.txt']; % html output
+htm_file = [bfname '_vislab_html.txt']; % html output without header
 
+if isfield(options, 'add_header_and_eof')
+    htm_file = [bfname '_vislab_zlist.html']; % html output
+end
+    
 % -- find the set of theses
 
-%txt2xls(  2, struct('fname', ini_file, 'ofname_xls', xls_file) );
 options.fname= ini_file;
 options.ofname_xls= xls_file;
 txt2xls(  2, options );
@@ -42,4 +45,4 @@ xls2mat(  xls_file, mat_file );
 
 % -- convert to HTML in order to publish
 
-mat2html( mat_file, htm_file );
+mat2html( mat_file, htm_file, options );

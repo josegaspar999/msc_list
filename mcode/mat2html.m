@@ -1,7 +1,11 @@
-function mat2html(mat_file, htm_file)
+function mat2html(mat_file, htm_file, options)
 % MAT2HTML  Convert information about MSc theses from MAT to HTML.
 %
-% Giovanni Saponaro
+% May2018 Giovanni Saponaro, 4Jun18 (more options) J. Gaspar
+
+if nargin<3
+    options= [];
+end
 
 % load MAT-file containing information about MSc theses
 m = load(mat_file);
@@ -36,12 +40,37 @@ fmt = ['\t<li><i><b>', ... % square brackets [] to preserve whitespace
      '%s', ... % url of thesis information page
      '">More information</a>.</li>\n'];
 
-% print the desired string from all the cells in the cell array
+% -- print the desired string (1 line) from all the cells of each line of the cell array
+%
 fid= 1;
 if ~isempty(htm_file)
     fid= fopen( htm_file, 'wt' );
 end
+
+% write header (allow standallone file)
+%
+if isfield(options, 'add_header_and_eof')
+    fprintf(fid, '<html><body>\n');
+    if isfield(options, 'title')
+        fprintf(fid, '<h1 align="center"><i>%s</i></h1>\n', options.title);
+    end
+    if isfield(options, 'title2')
+        fprintf(fid, '<h2 align="center"><i>%s</i></h2>\n', options.title2);
+    end
+    fprintf(fid, '<ul>\n');
+end
+
+% write data
+%
 cellfun(@(t,a,y,u) fprintf(fid,fmt,t,a,y,u), m.Author, m.Title, m.Year, m.url);
+
+% end file
+%
+if isfield(options, 'add_header_and_eof')
+    fprintf(fid, '</ul>\n');
+    fprintf(fid, '</body></html>\n');
+end
+
 if fid~=1
     fclose(fid);
 end

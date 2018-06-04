@@ -15,8 +15,12 @@ fname= '../data/180420_v0/online_DEEC_180420.txt';
 if isfield(options, 'fname'), fname= options.fname; end
 
 %options= struct('lines_ini','2017/2018', 'lines_end','* MEEC');
-options.lines_ini= '2017/2018';
-options.lines_end= '* MEEC';
+if ~isfield(options, 'lines_ini')
+    options.lines_ini= '2017/2018';
+end
+if ~isfield(options, 'lines_end')
+    options.lines_end= '* MEEC';
+end
 
 switch cmdId
     case 0
@@ -210,7 +214,13 @@ end
 % save data to the file
 if isfield( options, 'ofname_xls' )
     if exist( options.ofname_xls, 'file' )
-        error( ['Output file "' options.ofname_xls '" exists. Please delete or rename it.']);
+        str= ['Output file "' options.ofname_xls '" exists.'];
+        ButtonName = questdlg( [str 'Overwrite it?'] , ...
+            'Overwrite file', ...
+            'Yes', 'Abort', 'Abort');
+        if strcmp( ButtonName, 'Abort' )
+            error( [str ' User selected abort.'] );
+        end
     end
     xlswrite( options.ofname_xls, lstXLS );
     fprintf(1, '-- written file: %s\n', options.ofname_xls );
