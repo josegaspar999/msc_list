@@ -1,4 +1,12 @@
 
+-- 2018.10.29
+
+get html data: ../mcode/main_tst.m
+>> main_tst(-1)
+
+
+-- 2018.04.20
+
 Informação original está online na webpage:
 https://fenix.tecnico.ulisboa.pt/cursos/meec/dissertacoes
 

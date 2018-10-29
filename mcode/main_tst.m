@@ -28,12 +28,16 @@ switch tstId
         % first complete test txt->xls->mat->html
         bfname= '../data/180420_v0/online_DEEC_180420.txt';
         z_complete_process( bfname, options )
-        
+
     case 5
         % browse all MSc
-        error('under construction')
-        % fetch remote data to a new folder "dname"
-        % convert downloaded files to text files
+        %error('under construction')
+        % fetch remote data to a new folder "dname", just call
+        % >> main_tst(-1)
+        
+        % convert downloaded files to text files (by hand...)
+        conv_html2txt( '../data/181029t1' )
+
         % list txt files in "dname"
         % run "z_complete_process" for all text files
 
@@ -50,12 +54,31 @@ if nargin<1,
 end
 [y,m,d,~,~,~]= datevec(now); n=1;
 while 1,
-   str= sprintf('%02d%02d%02dt%d', ...
-      rem(y,100), m, d, n);
-   dname= [basePath str];
-   if ~exist(dname,'dir'),
-      break;
-   else
-      n= n+1;
-   end
+    str= sprintf('%02d%02d%02dt%d', ...
+        rem(y,100), m, d, n);
+    dname= [basePath str];
+    if ~exist(dname,'dir'),
+        break;
+    else
+        n= n+1;
+    end
 end
+
+
+function conv_html2txt( dname )
+d= dir( [dname '/*.htm*'] );
+
+for i=1:1 %length(d)
+    fname= [pwd '/' dname '/' d(i).name];
+    fname= strrep(fname, '/','\');
+    disp( fname );
+    % use MSWord to do the conversion
+end
+
+% return
+word_utils('startWord')
+% word_utils('openFile','');
+word_utils('openFile', fname);
+word_utils('closeWord')
+
+return
