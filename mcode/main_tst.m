@@ -1,21 +1,26 @@
-function main_tst( tstId, options )
+function ret_= main_tst( tstId, options )
 %
 % Get thesis supervised at Vislab
 
 % 23.4.2018 (1st ver), 30.5.2018 (moved fns to txt2xls.m), J. Gaspar
+% 1.11.2018 (tstId 7), J. Gaspar
 
 if nargin<1
-    tstId= 2;
+    tstId= 2; % nice default
+    %tstId= 7; % a do it all test
 end
 if nargin<2
     options= [];
 end
 
+ret= [];
+
 switch tstId
     case -1
         % fetch remote data
         dname= mkdname('../data/');
-        main_tst_get_data( dname );
+        main_tst_get_data( dname, struct('downloadFlag',1) );
+        ret= struct('dname', dname);
 
     case {0, 1, 2, 3}
         % preliminary tests
@@ -38,11 +43,24 @@ switch tstId
         % convert downloaded files to text files (by hand...)
         conv_html2txt( '../data/181029t1' )
 
+    case 6
         % list txt files in "dname"
         % run "z_complete_process" for all text files
+        parse_all_txt( '../data/181029t1' )
+        
+    case 7
+        % try it all
+        ret= main_tst(-1);
+        conv_html2txt( ret.dname )
+        parse_all_txt( ret.dname )
+        
 
     otherwise
         error('inv tstId')
+end
+
+if nargout>0
+    ret_= ret;
 end
 
 return; % end of main function
@@ -65,20 +83,99 @@ while 1,
 end
 
 
-function conv_html2txt( dname )
-d= dir( [dname '/*.htm*'] );
+function fname2= htm2txt_fname( fname )
+fname2= strrep(fname, '.htm', '.txt');
 
-for i=1:1 %length(d)
-    fname= [pwd '/' dname '/' d(i).name];
+
+function conv_html2txt( dname )
+
+p= [dname '/*.htm*'];
+d= dir( p );
+if length(d)<1
+    fprintf(1, 'Warn: no files found from:\n\t%s\n', p);
+    return
+end
+
+word_utils('startWord')
+% word_utils('openFile','');
+
+for i=1:length(d)
+    fname= [pwd '/' dname '/' d(i).name]; % full path needed
     fname= strrep(fname, '/','\');
     disp( fname );
     % use MSWord to do the conversion
+    word_utils('openFile', fname);
+    word_utils('saveAsTxt', htm2txt_fname( fname ) );
 end
 
-% return
-word_utils('startWord')
-% word_utils('openFile','');
-word_utils('openFile', fname);
 word_utils('closeWord')
+
+return
+
+
+function parse_all_txt( dname )
+
+p= [dname '/*.txt'];
+d= dir( p );
+if length(d)<1
+    fprintf(1, 'Warn: no files found from:\n\t%s\n', p);
+    return
+end
+
+ret= main_tst_get_data( dname );
+% ret= struct('baseURL', bfname, 'courseList', fname, ...
+%     'urlList1', urlList1, 'urlList2', urlList2, ...
+%     'ofnames', ofnames);
+
+options= [];
+urlList= {ret.urlList1};
+
+%for i=7
+for i=1:length(d)
+    if ~isempty( strfind( d(i).name, '_html.txt' ) )
+        % exclude files already processed
+        continue
+    end
+    
+    id= match_textfname_to_list( d(i).name, ret );
+    if id<1
+        % file not created by main_tst.m
+        warning( ['no match found for: ' d(i).name] )
+        continue
+    end
+
+    fname= [dname '/' d(i).name]; % relative path
+    fname= strrep(fname, '\','/');
+    disp(fname)
+
+    options.xlsMinLines= 1;
+    options.urlMain= urlList{id};
+    disp( options.urlMain )
+
+    z_complete_process( fname, options )
+end
+
+return
+
+
+function id= match_textfname_to_list( textfname, ret )
+% ret= struct('baseURL', bfname, 'courseList', fname, ...
+%     'urlList1', urlList1, 'urlList2', urlList2, ...
+%     'ofnames', ofnames);
+
+% textfname convert to htm filename
+htmfname= strrep( textfname, '.txt', '.htm' );
+
+% find the matching
+ofnames= {ret.ofnames};
+
+id= 0; % error indicator
+for i= 1:length( ofnames )
+    fname= ofnames{i};
+    if ~isempty( strfind( fname, htmfname ) )
+        id= i;
+        break
+    end
+end
 
 return

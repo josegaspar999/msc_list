@@ -213,6 +213,12 @@ end
 
 % save data to the file
 if isfield( options, 'ofname_xls' )
+
+    if isfield(options, 'xlsMinLines') && size(lstXLS,1) < options.xlsMinLines+1;
+        warning( 'Not enough lines found. NOT writing XLS.' )
+        return
+    end
+    
     if exist( options.ofname_xls, 'file' )
         str= ['Output file "' options.ofname_xls '" exists.'];
         ButtonName = questdlg( [str 'Overwrite it?'] , ...
@@ -222,6 +228,7 @@ if isfield( options, 'ofname_xls' )
             error( [str ' User selected abort.'] );
         end
     end
+    
     xlswrite( options.ofname_xls, lstXLS );
     fprintf(1, '-- written file: %s\n', options.ofname_xls );
 end

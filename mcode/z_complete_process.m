@@ -38,10 +38,18 @@ end
 options.fname= ini_file;
 options.ofname_xls= xls_file;
 txt2xls(  2, options );
+if ~exist( xls_file, 'file' )
+    fprintf(1, '** file "%s" not made (empty data found)\n', xls_file);
+    return
+end
 
 % -- complete the information with extra info from fenix
 
-xls2mat(  xls_file, mat_file );
+matFileMade= xls2mat(  xls_file, mat_file, options );
+if ~matFileMade
+    fprintf(1, '** file "%s" not made (empty data found)\n', mat_file);
+    return
+end
 
 % -- convert to HTML in order to publish
 
