@@ -52,7 +52,7 @@ switch tstId
         % try it all
         ret= main_tst(-1);
         conv_html2txt( ret.dname )
-        parse_all_txt( ret.dname )
+        parse_all_txt( ret.dname, options )
         
 
     otherwise
@@ -113,7 +113,11 @@ word_utils('closeWord')
 return
 
 
-function parse_all_txt( dname )
+function parse_all_txt( dname, options )
+
+if nargin<2
+    options= [];
+end
 
 p= [dname '/*.txt'];
 d= dir( p );
@@ -127,7 +131,6 @@ ret= main_tst_get_data( dname );
 %     'urlList1', urlList1, 'urlList2', urlList2, ...
 %     'ofnames', ofnames);
 
-options= [];
 urlList= {ret.urlList1};
 
 %for i=7
