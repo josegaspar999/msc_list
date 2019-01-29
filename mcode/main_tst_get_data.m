@@ -25,7 +25,7 @@ end
 bfname1= 'https://fenix.tecnico.ulisboa.pt/cursos/%s/';
 bfname= [bfname1 'dissertacoes#'];
 fname= {'ma', 'meaer', 'meambi', 'mebiol', 'mebiom', 'mec', 'meec', ...
-    'meft', 'mem', 'memec', 'meq'};
+    'meft', 'mem', 'memec', 'meq', 'meic-a'};
 
 % create output folder if it does not exist
 create_base_dir( dname )

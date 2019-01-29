@@ -49,7 +49,27 @@ end
 
 % write header (allow standallone file)
 %
-if isfield(options, 'add_header_and_eof')
+print_header_or_eof( 'header', fid, options );
+
+% write data
+%
+cellfun(@(t,a,y,u) fprintf(fid,fmt,t,a,y,u), m.Author, m.Title, m.Year, m.url);
+
+% end file
+%
+print_header_or_eof( 'eof', fid, options );
+
+if fid~=1
+    fclose(fid);
+end
+
+
+function print_header_or_eof( headerOrEOF, fid, options )
+if ~isfield(options, 'add_header_and_eof')
+    return
+end
+
+if strcmp(headerOrEOF, 'header')
     fprintf(fid, '<html><body>\n');
     if isfield(options, 'title')
         fprintf(fid, '<h1 align="center"><i>%s</i></h1>\n', options.title);
@@ -60,17 +80,7 @@ if isfield(options, 'add_header_and_eof')
     fprintf(fid, '<ul>\n');
 end
 
-% write data
-%
-cellfun(@(t,a,y,u) fprintf(fid,fmt,t,a,y,u), m.Author, m.Title, m.Year, m.url);
-
-% end file
-%
-if isfield(options, 'add_header_and_eof')
+if strcmp(headerOrEOF, 'eof')
     fprintf(fid, '</ul>\n');
     fprintf(fid, '</body></html>\n');
-end
-
-if fid~=1
-    fclose(fid);
 end
