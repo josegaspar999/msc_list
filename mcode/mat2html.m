@@ -6,6 +6,11 @@ function mat2html(mat_file, htm_file, options)
 if nargin<3
     options= [];
 end
+if isfield(options, 'just_header_or_footer')
+    print_header_or_eof( options.just_header_or_footer, ...
+        htm_file, options );
+    return
+end
 
 % load MAT-file containing information about MSc theses
 m = load(mat_file);

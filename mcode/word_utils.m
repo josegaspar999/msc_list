@@ -1,4 +1,9 @@
 function word_utils( cmd, fname )
+
+% see information in:
+% https://docs.microsoft.com/en-us/office/vba/api/word.saveas2
+% https://docs.microsoft.com/en-us/office/vba/api/word.wdsaveformat
+
 if nargin<1
     main_tst(5)
     return
@@ -19,6 +24,11 @@ switch cmd
         if isempty(MSWord.actxWord), warning('empty actxWord'); return; end
         if isempty(MSWord.wordHandle), warning('empty wordHandle'); return; end
         saveAsTxt( MSWord.wordHandle, fname );
+
+    case 'saveAsPdf'
+        if isempty(MSWord.actxWord), warning('empty actxWord'); return; end
+        if isempty(MSWord.wordHandle), warning('empty wordHandle'); return; end
+        saveAsPdf( MSWord.wordHandle, fname );
 
     case 'closeWord'
         if isempty(MSWord.actxWord), warning('empty actxWord'); return; end
@@ -70,6 +80,16 @@ end
 function saveAsTxt( wordHandle, fname )
 try
     invoke( wordHandle, 'SaveAs2', fname, 7 );
+catch
+    s=lasterror;
+    %error(s.message);
+    warning(s.message);
+end
+
+
+function saveAsPdf( wordHandle, fname )
+try
+    invoke( wordHandle, 'SaveAs2', fname, 17 );
 catch
     s=lasterror;
     %error(s.message);
