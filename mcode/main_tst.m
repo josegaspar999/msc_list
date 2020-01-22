@@ -76,10 +76,7 @@ end
 return; % end of main function
 
 
-function fname2= htm2txt_fname( fname )
-fname2= strrep(fname, '.htm', '.txt');
-
-
+% ---------------------------------------------------------------------
 function conv_html2txt( dname )
 
 p= [dname '/*.htm*'];
@@ -93,12 +90,17 @@ word_utils('startWord')
 % word_utils('openFile','');
 
 for i=1:length(d)
+    
+    % define IO filenames
     fname= [pwd '/' dname '/' d(i).name]; % full path needed
     fname= strrep(fname, '/','\');
-    disp( fname );
+    fname2= strrep(fname, '.htm', '.txt');
+    fprintf(1, '-- convert from HTML: %s\n', fname);
+    fprintf(1, '              to TXT: %s\n', fname2);
+
     % use MSWord to do the conversion
     word_utils('openFile', fname);
-    word_utils('saveAsTxt', htm2txt_fname( fname ) );
+    word_utils('saveAsTxt', fname2 );
 end
 
 word_utils('closeWord')
@@ -106,8 +108,10 @@ word_utils('closeWord')
 return
 
 
+% ---------------------------------------------------------------------
 function parse_all_txt( dname, options )
 % call "z_complete_process.m" for a set of input files *.txt
+% to make a set *_vislab_html.txt to (later) cat as a single html file
 
 if nargin<2
     options= [];
@@ -179,18 +183,32 @@ end
 return
 
 
+% ---------------------------------------------------------------------
 function html_mk_single_file( dname, options )
+% concatenate a set of files *_vislab_html.txt to a single html file
+% sort thesis by their dates (last to first)
 
 [y,m,d,~,~,~]= datevec(now);
-if 0
+if isfield(options, 'stdout_global_html') && options.stdout_global_html
     fid= 1;
 else
     fname= sprintf('vislab_supervised_msc_%02d%02d%02d.htm', rem(y,100),m,d);
+    if isfield(options, 'GH_ext')
+        fname= strrep( fname, '.htm', options.GH_ext );
+    end
     fname= [dname filesep fname];
     fid= fopen( fname, 'wt' );
 end
+
 titleStr=  'MSc Thesis Supervised by Vislab Researchers';
+if isfield( options, 'GH_titleStr' )
+    titleStr=  options.GH_titleStr;
+end
 titleStr2= sprintf('Updated %02d.%02d.%02d', d,m,y );
+if isfield( options, 'GH_titleStr2' )
+    titleStr2=  options.GH_titleStr2;
+end
+
 add_header_or_footer( 'header', fid, titleStr, titleStr2 );
 
 d= dir([dname filesep '*_html.txt']);

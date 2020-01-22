@@ -1,21 +1,34 @@
 function [dname, ret]= main_tst_get_data( dname, options )
 %
+% Download IST MSc thesis titles, authors and supervisors data
+%
+% By default, returns a folder name to get/use data based on today's date.
+% By default returns a novel folder name.
+% Return list of addresses to download data.
+% By default does not download data.
+%
 % dname: str : base output directory
 % ofnames: list of str : list of URLs to get (or got) data
 
-% 2018/05 (v0), 2018/11 (ret), JG
-% 2020/01 (mk dname), JG
+% Usage examples:
+% dname= main_tst_get_data( '', struct('getDnamePrev',1) );
+% options.downloadFlag= 1; dname= main_tst_get_data( '', options );
+% [~, ret]= main_tst_get_data( dname );
+% ret= struct('baseURL', bfname, 'courseList', fname, ...
+%     'urlList1', urlList1, 'urlList2', urlList2, ...
+%     'ofnames', ofnames);
 
-if nargin<1
-    dname= '../data';
+% 2018/05 (v0), 2018/11 (ret), JG
+% 2020/01 (mk & return dname), JG
+
+if nargin<1 || isempty(dname)
+    %dname= '../data';
+    [dname, dnamePrev]= mkdname('../data/');
 end
 if nargin<2
     options= [];
 end
 
-if isempty(dname)
-    [dname, dnamePrev]= mkdname('../data/');
-end
 if isfield( options, 'getDnamePrev' ) && options.getDnamePrev
     % a way to see if download was done already today
     dname= dnamePrev;
