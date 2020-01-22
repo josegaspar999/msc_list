@@ -2,12 +2,16 @@ function ret_= main_tst( tstId, options )
 %
 % Get thesis supervised at Vislab
 
+% Some tests:
+% main_tst( -1 )    % fetch remote data
+% main_tst( 7 )     % do it all test
+
 % 23.4.2018 (1st ver), 30.5.2018 (moved fns to txt2xls.m), J. Gaspar
 % 1.11.2018 (tstId 7), J. Gaspar
 
 if nargin<1
-    tstId= 2; % nice default
-    %tstId= 7; % a do it all test
+    %tstId= 2; % nice default
+    tstId= 7; % a do it all test
 end
 if nargin<2
     options= [];
@@ -18,9 +22,9 @@ ret= [];
 switch tstId
     case -1
         % fetch remote data
-        dname= mkdname('../data/');
-        main_tst_get_data( dname, struct('downloadFlag',1) );
-        ret= struct('dname', dname);
+        options.downloadFlag= 1;
+        dname= main_tst_get_data( '', options );
+        ret= dname;
 
     case {0, 1, 2, 3}
         % preliminary tests
@@ -50,9 +54,15 @@ switch tstId
         
     case 7
         % try it all
-        ret= main_tst(-1);
-        conv_html2txt( ret.dname )
-        parse_all_txt( ret.dname, options )
+        dname= main_tst_get_data( '', struct('getDnamePrev',1) );
+        if isempty( dname )
+            % need to download and conv to tst
+            dname= main_tst( -1 );
+            conv_html2txt( dname )
+            %parse_all_txt( dname, options )
+        end
+        parse_all_txt( dname, options )
+        html_mk_single_file( dname, options )
         
 
     otherwise
@@ -64,23 +74,6 @@ if nargout>0
 end
 
 return; % end of main function
-
-
-function dname= mkdname( basePath )
-if nargin<1,
-    basePath= '';
-end
-[y,m,d,~,~,~]= datevec(now); n=1;
-while 1,
-    str= sprintf('%02d%02d%02dt%d', ...
-        rem(y,100), m, d, n);
-    dname= [basePath str];
-    if ~exist(dname,'dir'),
-        break;
-    else
-        n= n+1;
-    end
-end
 
 
 function fname2= htm2txt_fname( fname )
@@ -114,6 +107,7 @@ return
 
 
 function parse_all_txt( dname, options )
+% call "z_complete_process.m" for a set of input files *.txt
 
 if nargin<2
     options= [];
@@ -126,7 +120,7 @@ if length(d)<1
     return
 end
 
-ret= main_tst_get_data( dname );
+[~, ret]= main_tst_get_data( dname );
 % ret= struct('baseURL', bfname, 'courseList', fname, ...
 %     'urlList1', urlList1, 'urlList2', urlList2, ...
 %     'ofnames', ofnames);
@@ -154,6 +148,7 @@ for i=1:length(d)
     options.xlsMinLines= 1;
     options.urlMain= urlList{id};
     disp( options.urlMain )
+    options.degree_name= upper(ret(id).courseList);
 
     z_complete_process( fname, options )
 end
@@ -182,3 +177,87 @@ for i= 1:length( ofnames )
 end
 
 return
+
+
+function html_mk_single_file( dname, options )
+
+[y,m,d,~,~,~]= datevec(now);
+if 0
+    fid= 1;
+else
+    fname= sprintf('vislab_supervised_msc_%02d%02d%02d.htm', rem(y,100),m,d);
+    fname= [dname filesep fname];
+    fid= fopen( fname, 'wt' );
+end
+titleStr=  'MSc Thesis Supervised by Vislab Researchers';
+titleStr2= sprintf('Updated %02d.%02d.%02d', d,m,y );
+add_header_or_footer( 'header', fid, titleStr, titleStr2 );
+
+d= dir([dname filesep '*_html.txt']);
+% d(:).name
+
+% for i=1:length(d)
+%     fname= [dname filesep d(i).name];
+%     y= text_read( fname );
+%     text_write( fid, y );
+% end
+y= cat_and_sort_by_years( dname, d );
+text_write( fid, y );
+
+add_header_or_footer( 'eof', fid, '', '' );
+
+if fid~=1
+    fclose(fid);
+end
+
+return; % end of main function
+
+
+function add_header_or_footer( headerOrEOF, fid, titleStr, titleStr2 )
+options= struct('add_header_and_eof',1, ...
+    'just_header_or_footer', headerOrEOF );
+options.title= titleStr;
+options.title2= titleStr2;
+mat2html([], fid, options)
+
+
+function y= cat_and_sort_by_years( dname, d )
+%
+% Sort lines by finding strings as 2019/2020 .. 2006/2007
+
+% dname : str
+% d     : ret from dir
+
+% concatenate all files into y
+y= {};
+for i=1:length(d)
+    fname= [dname filesep d(i).name];
+    x= text_read( fname );
+    y= text_cat( y, x );
+end
+
+% sort lines of y by finding years
+tosave= ones(1,length(y));
+[yr,~,~,~,~,~]= datevec(now);
+neword= [];
+for i= yr:-1:2007
+    str= sprintf('%d/%d', i-1, i);
+    jRange= find(tosave);
+    for j= jRange
+        % if y{j} contains str, then take it to the found list
+        if ~isempty( strfind( y{j}, str ) )
+            tosave(j)= 0;
+            neword(end+1)= j;
+        end
+    end
+end
+
+% check if some lines were not found
+jRange= find(tosave);
+if ~isempty(jRange)
+    warning('one or more lines have no year/nextyear information')
+end
+neword= [neword jRange];
+
+% finaly reorder y
+y= y(neword);

@@ -1,15 +1,26 @@
-function ret= main_tst_get_data( dname, options )
+function [dname, ret]= main_tst_get_data( dname, options )
 %
 % dname: str : base output directory
 % ofnames: list of str : list of URLs to get (or got) data
 
 % 2018/05 (v0), 2018/11 (ret), JG
+% 2020/01 (mk dname), JG
 
 if nargin<1
     dname= '../data';
 end
 if nargin<2
     options= [];
+end
+
+if isempty(dname)
+    [dname, dnamePrev]= mkdname('../data/');
+end
+if isfield( options, 'getDnamePrev' ) && options.getDnamePrev
+    % a way to see if download was done already today
+    dname= dnamePrev;
+    ret= [];
+    return
 end
 
 fnamePrefix= 'z_';
@@ -61,8 +72,39 @@ return; % end of main function
 
 function create_base_dir( dname )
 if ~exist(dname, 'dir')
-    str= input(['-- Create output folder "' dname '" (y/N)? '], 's');
-    if strcmpi(str, 'y')
-        mkdir( dname );
+    str= ['-- Create output folder "' dname '" (y/N)? '];
+    if 0
+        str= input(str, 's');
+        if strcmpi(str, 'y')
+            mkdir( dname );
+        end
+    else
+        str= questdlg(str, 'create folder', 'Yes', 'No', 'No');
+        if strcmp( str, 'Yes' )
+            mkdir( dname );
+        end
+    end
+end
+
+
+function [dname, dnamePrev]= mkdname( basePath )
+if nargin<1,
+    basePath= '';
+end
+if nargin<2
+    options= [];
+end
+
+dnamePrev= '';
+[y,m,d,~,~,~]= datevec(now); n=1;
+while 1,
+    str= sprintf('%02d%02d%02dt%d', ...
+        rem(y,100), m, d, n);
+    dname= [basePath str];
+    if ~exist(dname,'dir'),
+        break;
+    else
+        dnamePrev= dname;
+        n= n+1;
     end
 end

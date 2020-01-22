@@ -32,6 +32,9 @@ end
 
 % fields with constant value
 degree_name = 'Electrical and Computer Engineering';
+if isfield(options, 'degree_name')
+    degree_name= options.degree_name;
+end
 uni_name = 'IST';
 
 % custom format for VisLab WordPress HTML

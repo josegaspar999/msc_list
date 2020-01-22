@@ -3,6 +3,7 @@ function txt2xls( cmdId, options )
 % Get thesis supervised at Vislab
 
 % 23.4.2018 (1st ver) J. Gaspar
+% 21.1.2020 (removed dependence on "ini" "end" strings) J. Gaspar
 
 if nargin<1
     cmdId= 2; %3; %2; %1; %0;
@@ -16,10 +17,14 @@ if isfield(options, 'fname'), fname= options.fname; end
 
 %options= struct('lines_ini','2017/2018', 'lines_end','* MEEC');
 if ~isfield(options, 'lines_ini')
-    options.lines_ini= '2017/2018';
+    %options.lines_ini= '2017/2018';
+    %options.lines_ini= '2019/2020';
+    %options.lines_ini= find_max_year_nextyear( fname );
+    options.lines_ini= '';
 end
 if ~isfield(options, 'lines_end')
-    options.lines_end= '* MEEC';
+    %options.lines_end= '* MEEC';
+    options.lines_end= '';
 end
 
 switch cmdId
@@ -34,14 +39,14 @@ switch cmdId
     case 1
         % find all possible states of thesis
         mk_list_of_states( fname, options )
-
+        
     case {2, 3}
         % create XLS file from TXT info
         if cmdId == 3
             options.ofname_xls= strrep( fname, '.txt', '_vislab.xls' );
         end
         mk_list_of_thesis( fname, options )
-
+        
     otherwise
         error('inv tstId')
 end
@@ -77,7 +82,7 @@ for i= iRange
         nTitles= nTitles+1;
         str2= get_state_string( str );
         lstStates= list_states( lstStates, str2 );
-
+        
         fprintf( 1, '%d %s %s\n', nTitles, str2, str );
     end
 end
@@ -146,10 +151,10 @@ ind1= 1;
 ind2= length(y);
 for i= 1:length(y)
     str= y{i};
-    if ~isempty( strfind( str, options.lines_ini ) )
+    if ~isempty( options.lines_ini ) && ~isempty( strfind( str, options.lines_ini ) )
         ind1= i;
     end
-    if ~isempty( strfind( str, options.lines_end ) )
+    if ~isempty( options.lines_end ) && ~isempty( strfind( str, options.lines_end ) )
         ind2= i;
     end
 end
@@ -172,13 +177,14 @@ lstStates= {}; % start empty
 lst= get_supervisor_list( options );
 lstXLS= {'Year', 'State', 'Title', 'Author', 'Supervisors'};
 currYear= options.lines_ini;
+if isempty(currYear), currYear= find_max_year_nextyear( fname ); end
 prevYear= prev_year_calc( currYear );
 
 for i= iRange
-
+    
     % one line of text is the current data
     str= y{i};
-
+    
     % update year of the thesis
     if ~isempty( strfind( str, prevYear ) )
         currYear= prevYear;
@@ -187,14 +193,14 @@ for i= iRange
     
     % select thesis based on the supervisors
     if ~isempty( strfind( str, 'Coordenação: ' ) ) && has_one_str( str, lst )
-
+        
         % exclude DRAFT
         stateStr= get_state_string( y{i-2} );
         if strcmp( stateStr, 'DRAFT' )
             continue;
         end
         nCoord= nCoord+1;
-
+        
         % output
         if ~isfield( options, 'ofname_xls' )
             % visual output
@@ -213,7 +219,7 @@ end
 
 % save data to the file
 if isfield( options, 'ofname_xls' )
-
+    
     if isfield(options, 'xlsMinLines') && size(lstXLS,1) < options.xlsMinLines+1;
         warning( 'Not enough lines found. NOT writing XLS.' )
         return
@@ -266,3 +272,23 @@ end
 for i= 1:length(rmStr)
     tStr= strrep( tStr, rmStr{i}, '' );
 end
+
+
+% ------------------------------------------------------------------------
+function str= find_max_year_nextyear( fname )
+% there is not data older than 2006/2007
+
+tlines= text_read( fname );
+
+[y,~,~,~,~,~]= datevec(now);
+for i= y:-1:2007
+    str= sprintf('%d/%d', i-1, i);
+    for j= 1:length(tlines)
+        if ~isempty( strfind( tlines{j}, str ) )
+            % found string, just return, "str" is defined
+            return
+        end
+    end
+end
+
+warning('Not found string year/nextyear in file "%s"', fname);
