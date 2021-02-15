@@ -47,7 +47,8 @@ end
 
 % remote data to download
 bfname1= 'https://fenix.tecnico.ulisboa.pt/cursos/%s/';
-bfname= [bfname1 'dissertacoes#'];
+%bfname= [bfname1 'dissertacoes#'];
+bfname= [bfname1 'dissertacoes'];
 fname= {'ma', 'meaer', 'meambi', 'mebiol', 'mebiom', 'mec', 'meec', ...
     'meft', 'mem', 'memec', 'meq', 'meic-a'};
 
@@ -71,7 +72,12 @@ for i=1:length(fname)
     
     % do the download
     if downloadFlag
-        urlwrite( url, ofname );
+        try
+            urlwrite( url, ofname );
+        catch
+            fprintf(1, '** failed:\n%s\n   to:\n%s\n', ...
+                url, ofname );
+        end
     end
 end
 
