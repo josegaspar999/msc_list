@@ -56,7 +56,11 @@ return; % end of main function
 
 % ------------------------------------------------------------------------
 function lst= get_supervisor_list( options )
-lst= {'(ist12760)', '(ist13761)', '(ist11994)', '(ist13495)', '(ist31838)'};
+% lst= {'(ist12760)', '(ist13761)', '(ist11994)', '(ist13495)', ...
+%     '(ist31838)', '(ist158472)', '(ist46909)', '(ist45387)'};
+
+lst= txt2xls_supervisors();
+
 if isfield(options,'supervisorsList')
     lst= {};
     [lst{end+1}, remain]= strtok( options.supervisorsList, ',' );
@@ -186,7 +190,9 @@ for i= iRange
     str= y{i};
     
     % update year of the thesis
-    if ~isempty( strfind( str, prevYear ) )
+    if ~isempty( strfind( str, prevYear ) ) && ...
+            isempty( strfind( str, '2019/2020 2020/2021' ) )
+        % one line has all years, needs to be excluded
         currYear= prevYear;
         prevYear= prev_year_calc( currYear );
     end
