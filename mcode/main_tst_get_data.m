@@ -49,7 +49,7 @@ end
 bfname1= 'https://fenix.tecnico.ulisboa.pt/cursos/%s/';
 %bfname= [bfname1 'dissertacoes#'];
 bfname= [bfname1 'dissertacoes'];
-fname= {'ma', 'meaer', 'meambi', 'mebiol', 'mebiom', 'mec', 'meec', ...
+fname= {'ma', 'meaer', 'meambi', 'mebiol', 'mebiom', 'mec', 'meec', 'meec21', ...
     'meft', 'mem', 'memec', 'meq', 'meic-a'};
 
 % create output folder if it does not exist
