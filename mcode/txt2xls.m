@@ -180,6 +180,7 @@ lstStates= {}; % start empty
 
 lst= get_supervisor_list( options );
 lstXLS= {'Year', 'State', 'Title', 'Author', 'Supervisors'};
+
 currYear= options.lines_ini;
 if isempty(currYear), currYear= find_max_year_nextyear( fname ); end
 prevYear= prev_year_calc( currYear );
@@ -192,7 +193,7 @@ for i= iRange
     % update year of the thesis
     if ~isempty( strfind( str, prevYear ) ) && ...
             isempty( strfind( str, '2019/2020 2020/2021' ) )
-        % one line has all years, needs to be excluded
+        % one line has all years, needs to be excluded/ignored
         currYear= prevYear;
         prevYear= prev_year_calc( currYear );
     end
@@ -287,6 +288,7 @@ function str= find_max_year_nextyear( fname )
 tlines= text_read( fname );
 
 [y,~,~,~,~,~]= datevec(now);
+y= y+1; % consider also the next year, i.e. year after datevec(now)
 for i= y:-1:2007
     str= sprintf('%d/%d', i-1, i);
     for j= 1:length(tlines)

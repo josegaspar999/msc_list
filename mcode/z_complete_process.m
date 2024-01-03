@@ -24,6 +24,7 @@ end
 
 % -- make all filenames from a base name
 
+% in0_file = [bfname '.htm'];             % all theses
 ini_file = [bfname '.txt'];             % all theses
 xls_file = [bfname '_vislab.xls'];      % Vislab only
 mat_file = [bfname '_vislab.mat'];      % extra info saved
@@ -45,6 +46,7 @@ end
 
 % -- complete the information with extra info from fenix
 
+% matFileMade= xls2mat(  in0_file, xls_file, mat_file, options );
 matFileMade= xls2mat(  xls_file, mat_file, options );
 if ~matFileMade
     fprintf(1, '** file "%s" not made (empty data found)\n', mat_file);

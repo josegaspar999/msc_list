@@ -3,23 +3,29 @@ function matFileMade= xls2mat(xls_file, mat_file, options)
 %
 % 2018/05 (orig ver), Pedro Vicente, Giovanni Saponaro
 % 2018/11 (ret flag & options), JG
+% 2023/12 (in0_file), JG
 
-if nargin<3
+if nargin<3 %4
     options= [];
 end
 
 %% read Excel
-t = readtable(xls_file);
-
-meecprefix = mkDefault('https://fenix.tecnico.ulisboa.pt/cursos/meec/',options,'urlMain');
-url = [meecprefix mkDefault( 'dissertacoes#', options, 'urlSuffix' )];
-
-html = urlread(url);
-html2 = regexprep(html,' +',' '); % Remove space
-html2 = regexprep(html2,'&#39;','''');
-html2 = regexprep(html2,'&quot','"');
 
 t = readtable(xls_file);
+
+% meecprefix = mkDefault('https://fenix.tecnico.ulisboa.pt/cursos/meec/',options,'urlMain');
+% url = [meecprefix mkDefault( 'dissertacoes#', options, 'urlSuffix' )];
+% html = urlread(url);
+% html2 = regexprep(html,' +',' '); % Remove space
+% html2 = regexprep(html2,'&#39;','''');
+% html2 = regexprep(html2,'&quot','"');
+
+% tried function matFileMade= xls2mat(in0_file, xls_file, mat_file, options)
+% meecprefix = mkDefault('https://fenix.tecnico.ulisboa.pt/cursos/meec/',options,'urlMain');
+% html2 = fread_and_correct( in0_file );
+
+[html2, meecprefix] = fread_and_correct2( options );
+
 
 %% convert from table to struct
 s = table2struct(t, 'ToScalar',true);
@@ -70,3 +76,24 @@ if isfield( options, fieldName )
 else
     ret= defValue;
 end
+
+
+function html2 = fread_and_correct( in0_file )
+fid= fopen(in0_file, 'rt');
+html= fread( fid, Inf, 'uchar');
+fclose(fid);
+html= char(html(:)');
+html2 = regexprep(html,' +',' '); % Remove space
+html2 = regexprep(html2,'&#39;','''');
+html2 = regexprep(html2,'&quot','"');
+return
+
+
+function [html2, meecprefix] = fread_and_correct2( options )
+meecprefix = mkDefault('https://fenix.tecnico.ulisboa.pt/cursos/meec/',options,'urlMain');
+url = [meecprefix mkDefault( 'dissertacoes#', options, 'urlSuffix' )];
+html = webread(url);
+html2 = regexprep(html,' +',' '); % Remove space
+html2 = regexprep(html2,'&#39;','''');
+html2 = regexprep(html2,'&quot','"');
+return

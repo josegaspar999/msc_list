@@ -20,19 +20,28 @@ function [dname, ret]= main_tst_get_data( dname, options )
 
 % 2018/05 (v0), 2018/11 (ret), JG
 % 2020/01 (mk & return dname), JG
+% 2023/12 (alternative usages), JG
 
+if nargin<2
+    options= [];
+end
+if nargin>=1 && isnumeric(dname)
+    main_tst_get_data_alternative_usages( dname, options );
+    return
+end
 if nargin<1 || isempty(dname)
     %dname= '../data';
     [dname, dnamePrev]= mkdname('../data/');
 end
-if nargin<2
-    options= [];
-end
 
 if isfield( options, 'getDnamePrev' ) && options.getDnamePrev
     % a way to see if download was done already today
-    dname= dnamePrev;
     ret= [];
+    if options.getDnamePrev==2 && isempty(dnamePrev)
+        % do nothing
+        return
+    end
+    dname= dnamePrev;
     return
 end
 
@@ -49,7 +58,7 @@ end
 bfname1= 'https://fenix.tecnico.ulisboa.pt/cursos/%s/';
 %bfname= [bfname1 'dissertacoes#'];
 bfname= [bfname1 'dissertacoes'];
-fname= {'ma', 'meaer', 'meambi', 'mebiol', 'mebiom', 'mec', 'meec', 'meec21', ...
+fname= {'ma', 'meaer', 'meaer21', 'meambi', 'mebiol', 'mebiom', 'mec', 'meec', 'meec21', ...
     'meft', 'mem', 'memec', 'meq', 'meic-a'};
 
 % create output folder if it does not exist
@@ -73,7 +82,8 @@ for i=1:length(fname)
     % do the download
     if downloadFlag
         try
-            urlwrite( url, ofname );
+            %urlwrite( url, ofname );
+            websave( ofname, url );
         catch
             fprintf(1, '** failed:\n%s\n   to:\n%s\n', ...
                 url, ofname );
@@ -127,3 +137,51 @@ while 1,
         n= n+1;
     end
 end
+
+
+function main_tst_get_data_alternative_usages( dname, options )
+% code comes here if dname isnumeric
+% example: main_tst_get_data(-1)
+
+% error('under construction');
+
+dname= main_tst_get_data('', struct('getDnamePrev',2));
+if ~exist(dname, 'dir')
+    error('folder not found "%s", please mk the folder and download the data', dname);
+end
+
+% given the dname, check max date in files
+% see "function str= find_max_year_nextyear( fname )" in "txt2xls.m"
+
+d= dir([dname '/*.txt']);
+for i= 1:length(d)
+    if length(find(d(i).name=='_')) > 1
+        % accept just one "_", e.g. z_meec21.txt and not z_meec21_vislab_html.txt
+        continue
+    end
+    fname= [dname '/' d(i).name];
+    str= find_max_year_nextyear( fname );
+    fprintf(1, '%s \t%s\n', str, fname);
+end
+
+return
+
+
+function str= find_max_year_nextyear( fname )
+% there is not data older than 2006/2007
+
+tlines= text_read( fname );
+
+[y,~,~,~,~,~]= datevec(now);
+y= y+1; % consider also the next year, i.e. year after datevec(now)
+for i= y:-1:2007
+    str= sprintf('%d/%d', i-1, i);
+    for j= 1:length(tlines)
+        if ~isempty( strfind( tlines{j}, str ) )
+            % found string, just return, "str" is defined
+            return
+        end
+    end
+end
+
+warning('Not found string year/nextyear in file "%s"', fname);
