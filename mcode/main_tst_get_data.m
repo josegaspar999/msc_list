@@ -85,7 +85,7 @@ for i=1:length(fname)
             %urlwrite( url, ofname );
             websave( ofname, url );
         catch
-            fprintf(1, '** failed:\n%s\n   to:\n%s\n', ...
+            fprintf(1, '\n** failed:\n%s\n   to:\n%s\n   A retry may help...\n\n', ...
                 url, ofname );
         end
     end
